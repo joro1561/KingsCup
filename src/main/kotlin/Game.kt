@@ -55,6 +55,8 @@ class Game(private var players: List<Player>, private val deck: Deck, private va
             
             // TEMPORARY BEFORE UI INTEGRATION
             println("${currentPlayer.name} drew ${card.value} of ${card.suit}")
+            println(card)
+
             // TEMPORARY BEFORE UI INTEGRATION
 
             val rule = ruleManager.getRule(card.value)
