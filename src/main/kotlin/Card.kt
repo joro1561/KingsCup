@@ -3,11 +3,11 @@ class Card(val suit: String, val value: String){
         return """
           ___________
          |           |
-         | ${value.padEnd(2)}       |
+         | ${value.padEnd(2)}        |
          |           |
-         |    ${suitSymbol()}    |
+         |    ${suitSymbol()}      |
          |           |
-         |       ${value.padStart(2)} |
+         |       ${value.padStart(2)}  |
          |___________|
         """
     }

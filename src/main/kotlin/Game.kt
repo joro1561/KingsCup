@@ -1,22 +1,77 @@
-// Add GameUI when we have a UI
+import java.io.File
+
 class Game(private var players: List<Player>, private val deck: Deck, private val ruleManager: RuleManager){
 
+    //Exit Code
+    private var leaveGame = false
     // Keep Track of whose turn it is
     private var currentPlayerIndex = 0
+    //Variable for checking if they want to end the game early so you are not stuck in the game
+    private var endEarly = false
+    //Track The Turn we are on
+    private var turnCount = 1
 
-    //TODO: Add in while loop a check over the player ending their turn
+    //Start game function that gets called in the main file
     fun start(){
-        intializeGame()
-        while (!isGameOver()){
-            playTurn()
+        //Make it so the game ends but the program does not, in case you want to play again or restart
+        while(!leaveGame){
+            println("==========================MENU============================")
+            if (isGameOver()){
+                println("1. Play Again!")
+            }
+            else{
+                println("1. Play!")
+            }
+            println("2. Rules of Kings Cup!")
+            println("3. Quit :(")
+            println("==========================================================")
+            println("Please type a single number for your choice:")
+            var input = readLine() ?: ""
+
+            //Option to play the game
+            if(input == "1"){
+                intializeGame()
+                println("==========================================================")
+                println("Players:")
+                for(i in 0..(players.size - 1)){
+                    println("${players[i].name}")
+                }
+                while (!isGameOver()){
+                    println("==========================================================")
+                    println("Round ${turnCount}; That means ${53 - turnCount} cards left")
+                    println("==========================================================")
+                    playTurn()
+                    turnCount++
+                }
+                println("GAME OVER! Hope you had fun, stay hydrated! :)")
+            }
+
+            //Option to learn the rules
+            else if(input == "2"){
+                println("===========================RULES============================")
+                val ruleFile = "../resources/rulesMenu.txt"
+                File(ruleFile).forEachLine { line ->
+                    println(line)
+                }
+                println("============================================================")
+                println("Press Enter to go back to the Main Menu!")
+                readLine()
+            }
+
+            //Option to quit out
+            else if(input == "3"){
+                leaveGame = true
+                return
+            }
+
+            //Incorrect Input
+            else{
+                println("Incorrect Input! A Single Number; No Spaces please!")
+            }
         }
-        println("GAME OVER! Hope you had fun :)")
-        // finishGame()
-        return
     }
 
-    // TODO: Add visual for this
-    // Ask them if they want to shuffle the deck again
+    //intialize the game by setting up players and shuffling the deck 4 times
     private fun intializeGame(){
         if(players.isEmpty()){
             players = setupPlayers()
@@ -26,7 +81,7 @@ class Game(private var players: List<Player>, private val deck: Deck, private va
         }
     }
 
-    // TODO: Currently asks for direct input, need to make the input UI based
+    //Intialize all players when start of game comes around
     fun setupPlayers(): List<Player> {
         println("How many people are playing: ")
         val playerCount = readLine()?.toIntOrNull() ?: 0
@@ -41,66 +96,76 @@ class Game(private var players: List<Player>, private val deck: Deck, private va
         return newPlayers
     }
 
-    // TODO: Add visual for drawing card and displaying the rule
+    //Find a player based on the name input
+    fun getPlayer(name: String): Player? {
+        //return the player found without being case sensitive 
+        return players.find{it.name.equals(name, ignoreCase = true)}
+    }
+
+    //Where are the turn playing happens
     private fun playTurn(){
+        //Find the current player
         val currentPlayer = players[currentPlayerIndex]
 
-        // TEMPORARY BEFORE UI INTEGRATION
+        //If the current player has a buddy or buddies display them
+        if(!currentPlayer.buddies.isEmpty()){
+            val buddiesNames = currentPlayer.buddies.joinToString(separator = ", ") {it.name}
+            if (currentPlayer.buddies.size == 1){
+                println("Remember ${currentPlayer.name}, your buddy is ${buddiesNames}!")
+            }
+            else{
+                println("Remember ${currentPlayer.name}, your buddies are ${buddiesNames}!")
+            }
+        }
+
+        //Await the player to press Enter to draw their card
         println("It is ${currentPlayer.name}'s turn. Press Enter to draw a card!")
         readLine()
-        // TEMPORARY BEFORE UI INTEGRATION
 
+        //Draw a card
         val card = deck.drawCard()
         if (card != null){
-            
-            // TEMPORARY BEFORE UI INTEGRATION
+
             println("${currentPlayer.name} drew ${card.value} of ${card.suit}")
             println(card)
 
-            // TEMPORARY BEFORE UI INTEGRATION
-
             val rule = ruleManager.getRule(card.value)
+            println("The rule for ${card.value}:${rule?.description ?: "WHERE MY RULE AT?"}!")
 
-            // TEMPORARY BEFORE UI INTEGRATION
-            println("The rule for ${card.value} is ${rule?.description ?: "WHERE MY RULE AT?"}!")
-            // TEMPORARY BEFORE UI INTEGRATION
+            // 8 is Mate Rule
+            if (rule?.cardValue == "8"){
+                var buddy: Player?
+                //while you don't have a valid buddy loop through until they input a valid buddy
+                do{
+                    println("Choose your Mate!")
+                    val buddyName = readLine() ?: ""
+                    buddy = getPlayer(buddyName)
+                    if(buddy == null){
+                        println("Invalid Player to choose as a buddy. You said \"${buddyName}\".")
+                    }
+                } while(buddy == null)
+                //Add the buddies, and display the new buddies
+                currentPlayer.addBuddy(buddy)
+                println("${currentPlayer.name} is now buddies with ${buddy.name}!")
+            }
 
-            // Display the rule
-            // Wait for the player to click Done
-            
-            // If the card was an 8, prompt again but for the player to select a buddy
-            // if (card.value == "8"){
-            //     val selectedBuddy = gameUI.promptForBuddy(player, players)
-            //     player.addBuddy(selectedBuddy)
-            //     updateBuddyDisplay()
-            // }
-            
-            // Update the currentPlayerIndex
-
-            // TEMPORARY BEFORE UI INTEGRATION
-            println("Press Enter to end your turn.")
-            readLine()
-            // TEMPORARY BEFORE UI INTEGRATION
+            //Give option to keep playing to leave the game if you're done
+            println("Press Enter to end your turn or type \"done\" to quit the game early.")
+            val input = readLine()
+            if (input == "done"){
+                endEarly = true
+            }
         }
         else{
             println("No more cards in the deck.")
         }
+        //A circle loop so that current player index continously loops through all players
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size
     }
 
-    // Add in once we have a UI
-    // private fun updateBuddyDisplay() {
-    //     for (player in players) {
-    //         gameUI.displayBuddies(player, player.getBuddies())
-    //     }
-    // }
-
+    //A Check function for the game being over
     private fun isGameOver(): Boolean{
-        return deck.cards.isEmpty() || !deck.hasKing(deck)
+        return deck.cards.isEmpty() || !deck.hasKing(deck) || endEarly
     }
 
-    // TODO: Show in UI that the game has concluded
-    // private fun finishGame(){
-    //     return
-    // }
 }
