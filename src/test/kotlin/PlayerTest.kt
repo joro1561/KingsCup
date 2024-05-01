@@ -4,13 +4,13 @@ import org.junit.jupiter.api.Test
 class PlayerTest{
 
     @Test
-    fun 'basic test to make sure I can make a player lol'(){
+    fun basictesttomakesureIcanmakeaplayerlol(){
         val player = Player("Joey", arrayListOf())
         assertEquals(player.name, "Joey", "PlayerTest: They messed up my name, that's rude.")
     }
 
     @Test
-    fun 'adding buddies'(){
+    fun addingbuddies(){
         val player = Player("Joey", arrayListOf())
         val player2 = Player("Dylan", arrayListOf())
         assertEquals(player.name, "Joey", "PlayerTest: They messed up my name, that's rude.")
@@ -18,7 +18,7 @@ class PlayerTest{
 
         player.addBuddy(player2)
 
-        assertNotNull(buddyList(), "PlayerTest: BuddyList is null so that means we couldn't add buddies :(")
+        assertNotNull(player.buddyList(), "PlayerTest: BuddyList is null so that means we couldn't add buddies :(")
     }
 
 }
