@@ -1,5 +1,7 @@
 Ace. Ace is Waterfall:
-
+Person that draws this card starts drinking 
+and the person to their right drinks and so on.
+You can't stop drinking until the person before you stops.
 
 2. Two is You:
 Pick Someone to Drink!
